@@ -7,6 +7,7 @@ declare global {
   interface Window {
     gsap: any;
     ScrollTrigger: any;
+    gsapLoadPromise?: Promise<void>;
   }
 }
 
@@ -16,6 +17,7 @@ const OurServices = () => {
   const serviceItemsRef = useRef<(HTMLDivElement | null)[]>([]);
   const [gsapLoaded, setGsapLoaded] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const scrollTriggersRef = useRef<any[]>([]);
 
   // Check for mobile view
   useEffect(() => {
@@ -28,62 +30,125 @@ const OurServices = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Load GSAP dynamically
+  // Load GSAP with better conflict handling
   useEffect(() => {
-    if (typeof window !== 'undefined' && !window.gsap) {
-      const script = document.createElement('script');
-      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js';
-      script.onload = () => {
-        const stScript = document.createElement('script');
-        stScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js';
-        stScript.onload = () => {
-          window.gsap.registerPlugin(window.ScrollTrigger);
+    const loadGSAP = async () => {
+      if (typeof window === 'undefined') return;
+
+      // Check if GSAP is already loaded
+      if (window.gsap && window.ScrollTrigger) {
+        setGsapLoaded(true);
+        return;
+      }
+
+      // Use existing load promise if available
+      if (window.gsapLoadPromise) {
+        try {
+          await window.gsapLoadPromise;
           setGsapLoaded(true);
+        } catch (error) {
+          console.error('GSAP loading failed:', error);
+        }
+        return;
+      }
+
+      // Create new load promise
+      window.gsapLoadPromise = new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js';
+        script.onload = () => {
+          const stScript = document.createElement('script');
+          stScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js';
+          stScript.onload = () => {
+            try {
+              window.gsap.registerPlugin(window.ScrollTrigger);
+              resolve();
+            } catch (error) {
+              reject(error);
+            }
+          };
+          stScript.onerror = reject;
+          document.head.appendChild(stScript);
         };
-        document.head.appendChild(stScript);
-      };
-      document.head.appendChild(script);
-    } else if (window.gsap) {
-      setGsapLoaded(true);
-    }
+        script.onerror = reject;
+        document.head.appendChild(script);
+      });
+
+      try {
+        await window.gsapLoadPromise;
+        setGsapLoaded(true);
+      } catch (error) {
+        console.error('GSAP loading failed:', error);
+      }
+    };
+
+    loadGSAP();
   }, []);
 
   // Initialize animations when GSAP is loaded
   useEffect(() => {
     if (!gsapLoaded || !window.gsap || !window.ScrollTrigger) return;
 
-    // Clear any existing ScrollTriggers
-    window.ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+    const initAnimations = () => {
+      try {
+        // Clean up only our ScrollTriggers
+        scrollTriggersRef.current.forEach(trigger => {
+          if (trigger && trigger.kill) trigger.kill();
+        });
+        scrollTriggersRef.current = [];
 
-    // Animation for the main circle
-    window.gsap.from(circleRef.current, {
-      scrollTrigger: {
-        trigger: servicesRef.current,
-        start: "top bottom",
-        toggleActions: "play none none none"
-      },
-      scaleX: 0,
-      duration: 1.5,
-      ease: "power3.out"
-    });
+        // Animation for the main circle
+        const circleAnimation = window.gsap.from(circleRef.current, {
+          scrollTrigger: {
+            trigger: servicesRef.current,
+            start: "top bottom",
+            end: "bottom top",
+            toggleActions: "play none none none",
+            id: "services-circle"
+          },
+          scaleX: 0,
+          duration: 1.5,
+          ease: "power3.out"
+        });
 
-    // Staggered animation for service cards
-    window.gsap.from(serviceItemsRef.current, {
-      scrollTrigger: {
-        trigger: servicesRef.current,
-        start: "top 80%",
-        toggleActions: "play none none none"
-      },
-      opacity: 0,
-      y: 80,
-      rotationX: 45,
-      duration: 1,
-      stagger: 0.15,
-      ease: "power3.out"
-    });
+        // Staggered animation for service cards
+        const cardsAnimation = window.gsap.from(serviceItemsRef.current.filter(Boolean), {
+          scrollTrigger: {
+            trigger: servicesRef.current,
+            start: "top 80%",
+            end: "bottom top",
+            toggleActions: "play none none none",
+            id: "services-cards"
+          },
+          opacity: 0,
+          y: 80,
+          rotationX: 45,
+          duration: 1,
+          stagger: 0.15,
+          ease: "power3.out"
+        });
+
+        // Store our ScrollTriggers for cleanup
+        scrollTriggersRef.current = [
+          circleAnimation.scrollTrigger,
+          cardsAnimation.scrollTrigger
+        ].filter(Boolean);
+
+      } catch (error) {
+        console.error('Animation initialization failed:', error);
+      }
+    };
+
+    // Small delay to ensure DOM is ready
+    const timeoutId = setTimeout(initAnimations, 100);
 
     return () => {
-      window.ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+      clearTimeout(timeoutId);
+      // Clean up only our ScrollTriggers
+      scrollTriggersRef.current.forEach(trigger => {
+        if (trigger && trigger.kill) trigger.kill();
+      });
+      scrollTriggersRef.current = [];
     };
   }, [gsapLoaded]);
 
@@ -129,7 +194,7 @@ const OurServices = () => {
   return (
     <section 
       ref={servicesRef}
-      className="relative bg-[#29419a] text-white py-32 overflow-hidden"
+      className="relative bg-[#29419a] text-white py-32 overflow-x-hidden"
     >
       {/* Enhanced White Half-Circle with gradient */}
       <div 
@@ -139,7 +204,7 @@ const OurServices = () => {
       />
       
       {/* Animated decorative elements */}
-      <div className="absolute top-20 right-0 w-32 h-32 bg-[#f1ec43] bg-opacity-20 rounded-full "></div>
+      <div className="absolute top-20 right-0 w-32 h-32 bg-[#f1ec43] bg-opacity-20 rounded-full"></div>
       <div className="absolute bottom-20 left-20 w-24 h-24 bg-white bg-opacity-10 rounded-full animate-bounce" style={{animationDuration: '3s'}}></div>
       <div className="absolute top-1/2 right-10 w-16 h-16 bg-[#f1ec43] bg-opacity-30 rounded-full animate-ping" style={{animationDuration: '2s'}}></div>
       
@@ -176,7 +241,7 @@ const OurServices = () => {
           </p>
         </div>
 
-        {/* Services Grid - Fixed height cards */}
+        {/* Services Grid - Fixed height cards with fallback visibility */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
           {services.map((service, index) => {
             const IconComponent = service.icon;
@@ -185,7 +250,12 @@ const OurServices = () => {
               <div 
                 key={index}
                 ref={(el) => { serviceItemsRef.current[index] = el; }}
-                className="group h-[420px] perspective-1000"
+                className="group h-[420px] perspective-1000 opacity-100"
+                style={{ 
+                  // Fallback styles in case GSAP doesn't load
+                  transform: 'translateY(0px) rotateX(0deg)',
+                  transition: 'all 0.3s ease'
+                }}
               >
                 {/* Service Card with fixed height */}
                 <div className={`relative h-full bg-gradient-to-br ${service.bgGradient} backdrop-blur-sm rounded-2xl border border-white/10 overflow-hidden transition-all duration-500 hover:scale-105 hover:border-white/30 hover:shadow-2xl hover:shadow-blue-500/20`}>
@@ -209,7 +279,7 @@ const OurServices = () => {
                     
                     {/* Content Section with animated text */}
                     <div className="flex-grow relative overflow-hidden">
-                      <h3 className={`text-2xl font-bold text-white mb-4 transition-all duration-300 group-hover:${service.accentColor}`}>
+                      <h3 className="text-2xl font-bold text-white mb-4 transition-all duration-300 group-hover:text-blue-300">
                         {service.title}
                       </h3>
                       
@@ -270,10 +340,8 @@ const OurServices = () => {
               { number: "1000+", label: "Clients" }
             ].map((stat, index) => (
               <div key={index} className="group relative">
-                {/* Floating orb background */}
-                
                 <div className="relative text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-[#f1ec43] mb-1 transition-all duration-300 group-hover:scale-110 ">
+                  <div className="text-3xl md:text-4xl font-bold text-[#f1ec43] mb-1 transition-all duration-300 group-hover:scale-110">
                     {stat.number}
                   </div>
                   <div className="text-white/70 text-sm md:text-base transition-all duration-300 group-hover:text-white">
@@ -297,10 +365,8 @@ const OurServices = () => {
         <div className="text-center relative">
           <div className="max-w-3xl mx-auto">
             <div className="relative overflow-hidden">
-              {/* Background animation */}
-              
-              {/* Main question with typing animation effect */}
-              <h3 className="relative text-2xl md:text-4xl lg:text-5xl font-bold bg-white bg-clip-text text-transparent mb-6 ">
+              {/* Main question */}
+              <h3 className="relative text-2xl md:text-4xl lg:text-5xl font-bold bg-white bg-clip-text text-transparent mb-6">
                 What Else Do We Offer?
               </h3>
               
@@ -310,8 +376,6 @@ const OurServices = () => {
                 <div className="w-3 h-3 bg-[#f1ec43] rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
                 <div className="w-3 h-3 bg-[#f1ec43] rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
               </div>
-              
-      
               
               {/* Animated arrow indicator */}
               <div className="mt-8 flex justify-center">

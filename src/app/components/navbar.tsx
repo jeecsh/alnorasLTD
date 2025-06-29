@@ -29,7 +29,7 @@ const AlnorasNavbar = () => {
      <nav 
   className={`fixed top-0 left-6 right-6 z-50 transition-all duration-300 ${
     isScrolled 
-      ? 'bg-white backdrop-blur-md rounded-full shadow-[0_4px_20px_rgba(41,65,154,0.3)]'
+      ? 'bg-white backdrop-blur-md rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.5)]'
       : 'bg-transparent'
   }`}
 >
