@@ -3,8 +3,8 @@ import React, { useState, useEffect, useRef } from 'react';
 
 const ScrollSlideComponent = () => {
   const [scrollProgress, setScrollProgress] = useState(0);
-  const sectionRef = useRef(null);
-  const animationRef = useRef();
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const animationRef = useRef<number | null>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -25,7 +25,7 @@ const ScrollSlideComponent = () => {
     };
 
     // Simple quadratic easing function
-    function easeInOutQuad(t) {
+    function easeInOutQuad(t: number) {
       return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
     }
 

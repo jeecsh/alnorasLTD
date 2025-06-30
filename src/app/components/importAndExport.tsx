@@ -10,15 +10,29 @@ const ModernImportExportSections = () => {
   const importRef = useRef<HTMLDivElement>(null);
   const exportRef = useRef<HTMLDivElement>(null);
   const gsapLoaded = useGsap();
-  const [activeTab, setActiveTab] = useState('import');
+  const [activeTab, setActiveTab] = useState<'import' | 'export'>('import');
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
   const [showQuoteForm, setShowQuoteForm] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
 
+  // Type definitions for hero slides
+  type HeroSlide = {
+    image: string;
+    title: string;
+    subtitle: string;
+    stat: string;
+    statLabel: string;
+  };
+
+  type HeroSlides = {
+    import: HeroSlide[];
+    export: HeroSlide[];
+  };
+
   // Hero slider data
-  const heroSlides = {
+  const heroSlides: HeroSlides = {
     import: [
       {
         image: "/mna.jpg",
@@ -123,19 +137,19 @@ const ModernImportExportSections = () => {
     };
   }, [gsapLoaded, hasMounted]);
 
-  const sendWhatsAppMessage = (category, type = 'import') => {
+  const sendWhatsAppMessage = (category: { title: string; items: string[] }, type = 'import') => {
     const phoneNumber = '+249123456789';
     let message = '';
     
     if (type === 'import') {
       message = `Hello! I'm interested in learning more about ${category.title}. Specifically, I'd like information about:\n`;
-      category.items.forEach(item => {
+      category.items.forEach((item: string) => {
         message += `• ${item}\n`;
       });
       message += `\nCould you please provide more details about pricing, delivery times, and specifications?`;
     } else {
       message = `Hello! I'm interested in your export services for ${category.title}. I'd like to know more about:\n`;
-      category.items.forEach(item => {
+      category.items.forEach((item: string) => {
         message += `• ${item}\n`;
       });
       message += `\nPlease share details about export procedures, pricing, and minimum order quantities.`;
