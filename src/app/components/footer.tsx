@@ -39,7 +39,7 @@ const AlnorasFooter = () => {
             <img 
               src="/logo.png" 
               alt="Alnoras Logo" 
-              className="h-30 md:h-100 w-auto object-contain drop-shadow-xl"
+              className="h-0 md:h-100 w-auto object-contain drop-shadow-xl"
             />
           </div>
         </div>
