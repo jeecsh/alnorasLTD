@@ -24,27 +24,27 @@ const ModernAlnorasHero = () => {
   // Company overview content for slider
   const sliderContent = [
     {
-      image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop',
+      image: '/car.jpg',
       title: 'Car Rental Services',
       description: 'Premium fleet vehicles for corporate and personal transportation needs across Sudan, ensuring reliable mobility solutions.'
     },
     {
-      image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=300&fit=crop',
+      image: '/mech.jpg',
       title: 'Mechanical Workshop',
       description: 'State-of-the-art automotive repair and maintenance facilities with certified technicians and modern equipment.'
     },
     {
-      image: 'https://images.unsplash.com/photo-1586864387967-d02ef85d93e8?w=400&h=300&fit=crop',
+      image: 'trans.png',
       title: 'Transport Logistics',
       description: 'Comprehensive freight and cargo solutions connecting Sudan to regional and international markets efficiently.'
     },
     {
-      image: 'https://images.unsplash.com/photo-1565043589221-1a6fd9ae45c7?w=400&h=300&fit=crop',
+      image: '/imo.webp',
       title: 'Import & Export Services',
       description: 'From Sudan to the world and vice versa. We handle industrial machinery imports and agricultural product exports.'
     },
     {
-      image: 'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=400&h=300&fit=crop',
+      image: '/clean.webp',
       title: 'Clean Energy Solutions',
       description: 'Sustainable power solutions including solar installations and renewable energy systems for Sudan\'s future.'
     }

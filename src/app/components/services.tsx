@@ -1,155 +1,66 @@
 "use client";
 
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Car, Wrench, Truck, Sun, ArrowRight, Sparkles } from 'lucide-react';
-
-declare global {
-  interface Window {
-    gsap: any;
-    ScrollTrigger: any;
-    gsapLoadPromise?: Promise<void>;
-  }
-}
+import { useGsap } from '../lib/gsap';
 
 const OurServices = () => {
   const servicesRef = useRef<HTMLDivElement>(null);
   const circleRef = useRef<HTMLDivElement>(null);
   const serviceItemsRef = useRef<(HTMLDivElement | null)[]>([]);
-  const [gsapLoaded, setGsapLoaded] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-  const scrollTriggersRef = useRef<any[]>([]);
+  const gsapLoaded = useGsap();
 
-  // Check for mobile view
   useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+    if (!gsapLoaded || !servicesRef.current) return;
 
-  // Load GSAP with better conflict handling
-  useEffect(() => {
-    const loadGSAP = async () => {
-      if (typeof window === 'undefined') return;
-
-      // Check if GSAP is already loaded
-      if (window.gsap && window.ScrollTrigger) {
-        setGsapLoaded(true);
-        return;
-      }
-
-      // Use existing load promise if available
-      if (window.gsapLoadPromise) {
-        try {
-          await window.gsapLoadPromise;
-          setGsapLoaded(true);
-        } catch (error) {
-          console.error('GSAP loading failed:', error);
-        }
-        return;
-      }
-
-      // Create new load promise
-      window.gsapLoadPromise = new Promise((resolve, reject) => {
-        const script = document.createElement('script');
-        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js';
-        script.onload = () => {
-          const stScript = document.createElement('script');
-          stScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js';
-          stScript.onload = () => {
-            try {
-              window.gsap.registerPlugin(window.ScrollTrigger);
-              resolve();
-            } catch (error) {
-              reject(error);
-            }
-          };
-          stScript.onerror = reject;
-          document.head.appendChild(stScript);
-        };
-        script.onerror = reject;
-        document.head.appendChild(script);
-      });
-
-      try {
-        await window.gsapLoadPromise;
-        setGsapLoaded(true);
-      } catch (error) {
-        console.error('GSAP loading failed:', error);
-      }
-    };
-
-    loadGSAP();
-  }, []);
-
-  // Initialize animations when GSAP is loaded
-  useEffect(() => {
-    if (!gsapLoaded || !window.gsap || !window.ScrollTrigger) return;
-
-    const initAnimations = () => {
-      try {
-        // Clean up only our ScrollTriggers
-        scrollTriggersRef.current.forEach(trigger => {
-          if (trigger && trigger.kill) trigger.kill();
-        });
-        scrollTriggersRef.current = [];
-
-        // Animation for the main circle
-        const circleAnimation = window.gsap.from(circleRef.current, {
-          scrollTrigger: {
-            trigger: servicesRef.current,
-            start: "top bottom",
-            end: "bottom top",
-            toggleActions: "play none none none",
-            id: "services-circle"
+    const ctx = window.gsap.context(() => {
+      // Animation for the main circle
+      if (circleRef.current) {
+        window.gsap.fromTo(circleRef.current, 
+          {
+            scaleX: 0,
           },
-          scaleX: 0,
-          duration: 1.5,
-          ease: "power3.out"
-        });
-
-        // Staggered animation for service cards
-        const cardsAnimation = window.gsap.from(serviceItemsRef.current.filter(Boolean), {
-          scrollTrigger: {
-            trigger: servicesRef.current,
-            start: "top 80%",
-            end: "bottom top",
-            toggleActions: "play none none none",
-            id: "services-cards"
-          },
-          opacity: 0,
-          y: 80,
-          rotationX: 45,
-          duration: 1,
-          stagger: 0.15,
-          ease: "power3.out"
-        });
-
-        // Store our ScrollTriggers for cleanup
-        scrollTriggersRef.current = [
-          circleAnimation.scrollTrigger,
-          cardsAnimation.scrollTrigger
-        ].filter(Boolean);
-
-      } catch (error) {
-        console.error('Animation initialization failed:', error);
+          {
+            scrollTrigger: {
+              trigger: servicesRef.current,
+              start: "top bottom",
+              end: "bottom top",
+              toggleActions: "play none none none",
+            },
+            scaleX: 1,
+            duration: 1.5,
+            ease: "power3.out",
+          }
+        );
       }
-    };
 
-    // Small delay to ensure DOM is ready
-    const timeoutId = setTimeout(initAnimations, 100);
+      // Staggered animation for service cards with better fallback
+      const validItems = serviceItemsRef.current.filter(Boolean);
+      if (validItems.length > 0) {
+        window.gsap.fromTo(validItems,
+          {
+            opacity: 0,
+            y: 80,
+            rotationX: 45,
+          },
+          {
+            scrollTrigger: {
+              trigger: servicesRef.current,
+              start: "top 80%",
+              toggleActions: "play none none none",
+            },
+            opacity: 1,
+            y: 0,
+            rotationX: 0,
+            duration: 1,
+            stagger: 0.15,
+            ease: "power3.out",
+          }
+        );
+      }
+    }, servicesRef);
 
-    return () => {
-      clearTimeout(timeoutId);
-      // Clean up only our ScrollTriggers
-      scrollTriggersRef.current.forEach(trigger => {
-        if (trigger && trigger.kill) trigger.kill();
-      });
-      scrollTriggersRef.current = [];
-    };
+    return () => ctx.revert();
   }, [gsapLoaded]);
 
   const services = [
@@ -162,7 +73,7 @@ const OurServices = () => {
       iconBg: "bg-blue-500/20",
       accentColor: "text-blue-300"
     },
-    {
+    { 
       icon: Wrench,
       title: "Mechanic Workshop",
       description: "Top-notch vehicle care in our fully equipped mechanic workshop with expert technicians.",
@@ -194,7 +105,8 @@ const OurServices = () => {
   return (
     <section 
       ref={servicesRef}
-      className="relative bg-[#29419a] text-white py-32 overflow-x-hidden"
+      className="relative bg-[#29419a] text-white py-32 overflow-hidden"
+      id="services-section"
     >
       {/* Enhanced White Half-Circle with gradient */}
       <div 
@@ -241,7 +153,7 @@ const OurServices = () => {
           </p>
         </div>
 
-        {/* Services Grid - Fixed height cards with fallback visibility */}
+        {/* Services Grid - Better visibility and animation handling */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
           {services.map((service, index) => {
             const IconComponent = service.icon;
@@ -249,12 +161,15 @@ const OurServices = () => {
             return (
               <div 
                 key={index}
-                ref={(el) => { serviceItemsRef.current[index] = el; }}
-                className="group h-[420px] perspective-1000 opacity-100"
-                style={{ 
-                  // Fallback styles in case GSAP doesn't load
-                  transform: 'translateY(0px) rotateX(0deg)',
-                  transition: 'all 0.3s ease'
+                ref={(el) => {
+                  serviceItemsRef.current[index] = el;
+                }}
+                className="group h-[420px] perspective-1000"
+                style={{
+                  // Better fallback styles with proper visibility
+                  opacity: gsapLoaded ? undefined : 1,
+                  transform: gsapLoaded ? undefined : 'translateY(0px) rotateX(0deg)',
+                  transition: 'all 0.3s ease',
                 }}
               >
                 {/* Service Card with fixed height */}

@@ -2,98 +2,42 @@
 
 import React, { useRef, useEffect, useState } from 'react';
 import { MapPin, Phone, MessageCircle, Mail, Clock, Send, Navigation, Sparkles, ArrowRight } from 'lucide-react';
-
-declare global {
-  interface Window {
-    gsap: any;
-    ScrollTrigger: any;
-    gsapLoadPromise?: Promise<void>;
-  }
-}
+import { useGsap } from '../lib/gsap';
 
 const ContactUs = () => {
   const contactRef = useRef<HTMLDivElement>(null);
   const contactItemsRef = useRef<(HTMLDivElement | null)[]>([]);
-  const [gsapLoaded, setGsapLoaded] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  const gsapLoaded = useGsap();
   const [hasMounted, setHasMounted] = useState(false);
-  const scrollTriggersRef = useRef<any[]>([]);
 
-  // Check for mobile view
   useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  // Use existing GSAP if available
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    // Check if already loaded
-    if (window.gsap && window.ScrollTrigger) {
-      setGsapLoaded(true);
-      return;
-    }
-
-    // Use existing load promise if available
-    if (window.gsapLoadPromise) {
-      window.gsapLoadPromise.then(() => setGsapLoaded(true));
-      return;
-    }
-
-    // Don't attempt to load GSAP - let OurServices handle it
-    // Just wait for it to be loaded
-    const checkInterval = setInterval(() => {
-      if (window.gsap && window.ScrollTrigger) {
-        setGsapLoaded(true);
-        clearInterval(checkInterval);
-      }
-    }, 100);
-
-    return () => clearInterval(checkInterval);
+    setHasMounted(true);
   }, []);
 
   // Initialize animations when GSAP is loaded
   useEffect(() => {
-    if (!gsapLoaded || !window.gsap || !window.ScrollTrigger || !hasMounted) return;
+    if (!gsapLoaded || !hasMounted || !contactRef.current) return;
 
-    // Clear only our ScrollTriggers
-    scrollTriggersRef.current.forEach(trigger => {
-      if (trigger && trigger.kill) trigger.kill();
-    });
+    const ctx = window.gsap.context(() => {
+      const validItems = contactItemsRef.current.filter(Boolean);
+      if (validItems.length > 0) {
+        window.gsap.from(validItems, {
+          scrollTrigger: {
+            trigger: contactRef.current,
+            start: "top 80%",
+            toggleActions: "play none none none",
+          },
+          opacity: 0,
+          y: 80,
+          rotationX: 45,
+          duration: 1,
+          stagger: 0.15,
+          ease: "power3.out",
+        });
+      }
+    }, contactRef);
 
-    // Staggered animation for contact cards
-    const validItems = contactItemsRef.current.filter(Boolean);
-    if (validItems.length > 0) {
-      const animation = window.gsap.from(validItems, {
-        scrollTrigger: {
-          trigger: contactRef.current,
-          start: "top 80%",
-          toggleActions: "play none none none",
-          id: "contact-cards"
-        },
-        opacity: 0,
-        y: 80,
-        rotationX: 45,
-        duration: 1,
-        stagger: 0.15,
-        ease: "power3.out"
-      });
-
-      scrollTriggersRef.current = [animation.scrollTrigger].filter(Boolean);
-    }
-
-    return () => {
-      scrollTriggersRef.current.forEach(trigger => {
-        if (trigger && trigger.kill) trigger.kill();
-      });
-      scrollTriggersRef.current = [];
-    };
+    return () => ctx.revert();
   }, [gsapLoaded, hasMounted]);
 
 
@@ -115,7 +59,7 @@ const ContactUs = () => {
       title: "WhatsApp Chat",
       primary: "+249110022500",
       secondary: "Quick response guaranteed",
-      action: handleWhatsAppContact,
+      action: () => window.open('https://wa.me/249110022500?text=Hello, I would like to inquire about your services.', '_blank'),
       actionText: "Start Chat",
       bgGradient: "from-blue-500/15 via-blue-400/8 to-blue-400",
       iconBg: "bg-blue-500/20",
@@ -127,7 +71,7 @@ const ContactUs = () => {
       title: "Email Support",
       primary: "info@alnorasgroup.com",
       secondary: "Professional support team",
-      action: handleEmailContact,
+      action: () => window.open('mailto:info@alnorasgroup.com?subject=Inquiry&body=Hello, I would like to inquire about your services.', '_blank'),
       actionText: "Send Email",
       bgGradient: "from-blue-500/15 via-blue-400/8 to-blue-400",
       iconBg: "bg-blue-500/20",
@@ -286,7 +230,7 @@ const ContactUs = () => {
           </div>
 
           {/* Interactive Map */}
-          <div className="bg-gradient-to-br from-blue-500/10 to-blue-400/5 rounded-xl sm:rounded-2xl p-6 sm:p-8 border border-white/10 relative overflow-hidden group cursor-pointer shadow-lg hover:shadow-xl transition-all duration-300" onClick={handleLocationClick}>
+          <div className="bg-gradient-to-br from-blue-500/10 to-blue-400/5 rounded-xl sm:rounded-2xl p-6 sm:p-8 border border-white/10 relative overflow-hidden group cursor-pointer shadow-lg hover:shadow-xl transition-all duration-300" onClick={() => window.open('https://maps.google.com/?q=PortSudan+Industrial+Area+Southeast+Minna+Hotel+Apartments', '_blank')}>
             <div className="flex items-center gap-3 mb-4 sm:mb-6">
               <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#f1ec43]/20 rounded-xl flex items-center justify-center">
                 <Navigation className="w-5 h-5 sm:w-6 sm:h-6 text-[#f1ec43]" />

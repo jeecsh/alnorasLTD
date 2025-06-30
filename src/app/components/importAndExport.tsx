@@ -2,61 +2,14 @@
 
 import React, { useRef, useEffect, useState } from 'react';
 import { Package, Truck, Factory, Wheat, Globe, ArrowUpRight, ArrowDownLeft, Sparkles, TrendingUp, Ship, Plane, Zap, Target, Shield, Award, Phone, Mail, MapPin, CheckCircle, Clock, Users, MessageCircle, ChevronRight, Play, Pause, Send, Navigation, ArrowRight } from 'lucide-react';
-
-declare global {
-  interface Window {
-    gsap: any;
-    ScrollTrigger: any;
-  }
-}
-
-// Global GSAP loader utility
-const loadGSAP = (() => {
-  let gsapPromise: Promise<boolean> | null = null;
-  
-  return () => {
-    if (gsapPromise) return gsapPromise;
-    
-    if (typeof window !== 'undefined' && window.gsap && window.ScrollTrigger) {
-      return Promise.resolve(true);
-    }
-    
-    gsapPromise = new Promise((resolve) => {
-      if (typeof window === 'undefined') {
-        resolve(false);
-        return;
-      }
-      
-      const script = document.createElement('script');
-      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js';
-      script.onload = () => {
-        const stScript = document.createElement('script');
-        stScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js';
-        stScript.onload = () => {
-          if (window.gsap && window.ScrollTrigger) {
-            window.gsap.registerPlugin(window.ScrollTrigger);
-            resolve(true);
-          } else {
-            resolve(false);
-          }
-        };
-        stScript.onerror = () => resolve(false);
-        document.head.appendChild(stScript);
-      };
-      script.onerror = () => resolve(false);
-      document.head.appendChild(script);
-    });
-    
-    return gsapPromise;
-  };
-})();
+import { useGsap } from '../lib/gsap';
 
 const ModernImportExportSections = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
   const importRef = useRef<HTMLDivElement>(null);
   const exportRef = useRef<HTMLDivElement>(null);
-  const [gsapLoaded, setGsapLoaded] = useState(false);
+  const gsapLoaded = useGsap();
   const [activeTab, setActiveTab] = useState('import');
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
   const [showQuoteForm, setShowQuoteForm] = useState(false);
@@ -68,21 +21,21 @@ const ModernImportExportSections = () => {
   const heroSlides = {
     import: [
       {
-        image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1200&h=600&fit=crop",
+        image: "/mna.jpg",
         title: "From Global Ports to Your Doorstep",
         subtitle: "State-of-the-art machinery delivered with full customs clearance and installation support",
         stat: "500+",
         statLabel: "Machines Imported"
       },
       {
-        image: "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=1200&h=600&fit=crop",
+        image: "/ind.jpeg",
         title: "Industrial Excellence Delivered",
         subtitle: "Premium manufacturing equipment from trusted global suppliers",
         stat: "25+",
         statLabel: "Countries Sourced"
       },
       {
-        image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&h=600&fit=crop",
+        image: "con.jpg",
         title: "Construction Power Solutions",
         subtitle: "Heavy machinery and construction equipment for Sudan's infrastructure",
         stat: "95%",
@@ -91,21 +44,21 @@ const ModernImportExportSections = () => {
     ],
     export: [
       {
-        image: "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=1200&h=600&fit=crop",
+        image: "/qual.jpg",
         title: "Premium Quality, Global Standards",
         subtitle: "Exporting Sudan's agricultural wealth and natural resources to markets worldwide",
         stat: "30+",
         statLabel: "Export Markets"
       },
       {
-        image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=1200&h=600&fit=crop",
+        image: "sms.webp",
         title: "Agricultural Excellence Worldwide",
         subtitle: "Premium sesame, gum arabic, and cotton reaching international markets",
         stat: "50K+",
         statLabel: "Tons Exported"
       },
       {
-        image: "https://images.unsplash.com/photo-1621732342853-4c13cb0ba825?w=1200&h=600&fit=crop",
+        image: "/nat.jpg",
         title: "Natural Resources Global Trade",
         subtitle: "Connecting Sudan's mineral wealth with international buyers",
         stat: "15+",
@@ -129,15 +82,6 @@ const ModernImportExportSections = () => {
 
     return () => clearInterval(interval);
   }, [activeTab, isPaused, heroSlides, hasMounted]);
-
-  // Load GSAP
-  useEffect(() => {
-    if (!hasMounted) return;
-    
-    loadGSAP().then((loaded) => {
-      setGsapLoaded(loaded);
-    });
-  }, [hasMounted]);
 
   // Initialize animations with proper cleanup
   useEffect(() => {
@@ -207,7 +151,7 @@ const ModernImportExportSections = () => {
       icon: Wheat, 
       title: "Agricultural Machinery", 
       items: ["Tractors & Harvesters", "Irrigation Pumps", "Planting Equipment"],
-      image: "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&h=400&fit=crop",
+      image: "agr.jpg",
       color: "",
       description: "Advanced farming equipment to boost agricultural productivity"
     },
@@ -215,7 +159,7 @@ const ModernImportExportSections = () => {
       icon: Factory, 
       title: "Industrial Machinery", 
       items: ["Oil Press Machines", "Food Processing Units", "Packaging Lines"],
-      image: "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=600&h=400&fit=crop",
+      image: "/indd.avif",
       color: "",
       description: "High-quality industrial equipment for manufacturing excellence"
     },
@@ -223,7 +167,7 @@ const ModernImportExportSections = () => {
       icon: Truck, 
       title: "Construction Equipment", 
       items: ["Concrete Mixers", "Loaders & Compactors", "Heavy Machinery"],
-      image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=400&fit=crop",
+      image: "/coneq.jpg",
       color: "",
       description: "Heavy-duty construction machines for infrastructure development"
     },
@@ -231,7 +175,7 @@ const ModernImportExportSections = () => {
       icon: Package, 
       title: "Factory Equipment", 
       items: ["Conveyor Belts", "Filling Machines", "Custom Tools"],
-      image: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=600&h=400&fit=crop",
+      image: "fac.png",
       color: "",
       description: "Specialized factory equipment for streamlined production"
     }
@@ -242,7 +186,7 @@ const ModernImportExportSections = () => {
       icon: Wheat, 
       title: "Agricultural Products", 
       items: ["Premium Sesame Seeds", "High-Quality Gum Arabic", "Organic Cotton"],
-      image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&h=400&fit=crop",
+      image: "/ss.png",
       volume: "50,000+ tons/year",
       color: "",
       description: "Sudan's finest agricultural exports meeting global standards"
@@ -251,7 +195,7 @@ const ModernImportExportSections = () => {
       icon: Zap, 
       title: "Minerals & Resources", 
       items: ["Gold & Precious Metals", "Chrome Ore", "Iron Ore"],
-      image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=600&h=400&fit=crop",
+      image: "/min.webp",
       volume: "25,000+ tons/year",
       color: "",
       description: "Rich mineral resources from Sudan's abundant deposits"
@@ -260,7 +204,7 @@ const ModernImportExportSections = () => {
       icon: Package, 
       title: "Manufactured Goods", 
       items: ["Textiles & Garments", "Processed Foods", "Handicrafts"],
-      image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&h=400&fit=crop",
+      image: "/mann.jpeg",
       volume: "10,000+ units/month",
       color: "",
       description: "Quality manufactured products showcasing Sudanese craftsmanship"
@@ -400,12 +344,11 @@ const ModernImportExportSections = () => {
                   </div>
                   
                   {/* Floating Stats */}
-                  <div className="absolute top-6 right-6 bg-[#f1ec43] text-[#29419a] p-4 rounded-2xl shadow-2xl animate-fade-up delay-400">
-                    <div className="text-2xl font-black">{currentHeroSlide.stat}</div>
-                    <div className="text-xs font-bold">{currentHeroSlide.statLabel}</div>
+               <div className="absolute top-0 left-0 bg-[#f1ec43] text-[#29419a] p-2 sm:p-4 rounded-4xl shadow-2xl animate-fade-up delay-400">
+                    <div className="text-sm sm:text-2xl font-black">{currentHeroSlide.stat}</div>
+                    <div className="text-xs font-bold sm:text-xs">{currentHeroSlide.statLabel}</div>
                   </div>
                 </div>
-
                 {/* Slider Controls */}
                 <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex items-center gap-4">
                   <button
@@ -553,9 +496,9 @@ const ModernImportExportSections = () => {
                   </div>
                   
                   {/* Floating Stats */}
-                  <div className="absolute top-6 left-6 bg-[#f1ec43] text-[#29419a] p-4 rounded-2xl shadow-2xl animate-fade-up delay-400">
-                    <div className="text-2xl font-black">{currentHeroSlide.stat}</div>
-                    <div className="text-xs font-bold">{currentHeroSlide.statLabel}</div>
+                  <div className="absolute top-0 left-0 bg-[#f1ec43] text-[#29419a] p-2 sm:p-4 rounded-4xl shadow-2xl animate-fade-up delay-400">
+                    <div className="text-sm sm:text-2xl font-black">{currentHeroSlide.stat}</div>
+                    <div className="text-xs font-bold sm:text-xs">{currentHeroSlide.statLabel}</div>
                   </div>
                 </div>
 
@@ -687,15 +630,7 @@ const ModernImportExportSections = () => {
      
         
 
-      {/* Floating Action Button */}
-      <div className="fixed bottom-8 right-8 z-40">
-        <button 
-          onClick={() => setShowQuoteForm(true)}
-          className="group bg-[#f1ec43] text-[#29419a] p-4 rounded-2xl shadow-2xl cursor-pointer transform hover:scale-110 transition-all duration-300 flex items-center justify-center"
-        >
-          <Phone className="w-6 h-6 group-hover:rotate-12 transition-transform duration-300" />
-        </button>
-      </div>
+  
 
       <style jsx>{`
         @keyframes float {

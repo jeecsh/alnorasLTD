@@ -4,9 +4,9 @@ import React from 'react';
 
 const AlnorasFooter = () => {
   return (
-    <footer className="relative bg-white overflow-hidden pt-40">
+    <footer className="relative bg-white overflow-hidden pt-20 pb-6">
       {/* Decorative Wave */}
-      <div className="absolute inset-x-0 top-0 flex justify-center h-[200px] md:h-[280px] overflow-hidden pointer-events-none">
+      <div className="absolute inset-x-0 top-0 flex justify-center h-[120px] md:h-[180px] overflow-hidden pointer-events-none z-0">
         <div className="w-full">
           <svg
             className="w-full h-full"
@@ -23,30 +23,30 @@ const AlnorasFooter = () => {
       </div>
 
       {/* Main Content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 pb-16">
-        <div className="text-left md:text-left flex flex-col md:flex-row justify-between items-start gap-10">
-          {/* Brand */}
-          <div>
-            <h3 className="text-4xl font-bold text-[#29419a]">ALNORAS</h3>
+      <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12">
+        <div className="flex flex-row md:flex-row items-center justify-between gap-10">
+          {/* Text */}
+          <div className="text-left">
+            <h3 className="text-3xl md:text-4xl font-bold text-[#29419a]">ALNORAS</h3>
             <div className="w-20 h-1 bg-[#f1ec43] mt-2 mb-4 rounded-full"></div>
             <p className="text-gray-600 text-sm max-w-sm leading-relaxed">
               Pioneering the future of smart logistics and efficient transport. We combine technology and reliability for global trade excellence.
             </p>
           </div>
 
-          {/* CTA or Tagline */}
-          <div className="flex flex-col gap-3">
-            <h4 className="text-lg font-semibold text-[#29419a]">Built for the Future</h4>
-            <p className="text-sm text-gray-600 max-w-xs">
-             “From ports to progress—building tomorrow’s Sudan with every shipment.”
-            </p>
-       
+          {/* Logo */}
+          <div className="relative -mb-12 md:-mb-20 z-20">
+            <img 
+              src="/logo.png" 
+              alt="Alnoras Logo" 
+              className="h-30 md:h-100 w-auto object-contain drop-shadow-xl"
+            />
           </div>
         </div>
       </div>
 
       {/* Bottom Bar */}
-      <div className="bg-transparent mb-3 text-center text-sm text-gray-600 relative z-10">
+      <div className="mt-12 text-center text-sm text-gray-600 relative z-10">
         © 2025 Alnoras Integrated Co. Ltd. — All rights reserved.
       </div>
 

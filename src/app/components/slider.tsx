@@ -56,7 +56,7 @@ const ScrollSlideComponent = () => {
       >
         {/* Yellow sliding background - removed transform for better performance */}
         <div 
-          className="absolute top-0 left-0 h-full bg-[#f1ec43] transition-all duration-300 ease-out"
+          className="absolute top-0 left-0 h-full bg-white transition-all duration-300 ease-out"
           style={{
             width: `${scrollProgress * 100}%`,
           }}
@@ -65,7 +65,7 @@ const ScrollSlideComponent = () => {
         {/* Text content */}
         <div className="relative z-10 h-full flex flex-col items-center justify-center px-8 text-center">
           <h3 
-            className="text-2xl md:text-3xl font-bold mb-2 transition-colors duration-300"
+            className="text-4xl md:text-3xl font-extrabold mb-2 transition-colors duration-300"
             style={{
               color: scrollProgress > 0.3 ? '#29419a' : 'transparent'
             }}

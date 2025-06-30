@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Menu, X, ChevronDown } from 'lucide-react';
+import { Menu, X, Download } from 'lucide-react';
 
 const AlnorasNavbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -17,12 +17,19 @@ const AlnorasNavbar = () => {
   }, []);
 
   const menuItems = [
-    { name: 'Home', href: '#home' },
-    { name: 'Services', href: '#services', hasDropdown: true },
-    { name: 'About', href: '#about' },
+    { name: 'About', href: '#home' },
+    { name: 'Services', href: '#services' },
     { name: 'Import/Export', href: '#import' },
     { name: 'Contact', href: '#contact' }
   ];
+
+  const handleCatalogDownload = () => {
+    // Create a download link for the catalog from public folder
+    const link = document.createElement('a');
+    link.href = '/catalog.pdf'; // Assuming your catalog is named catalog.pdf
+    link.download = 'Alnoras-Catalog.pdf';
+    link.click();
+  };
 
   return (
     <>
@@ -53,90 +60,94 @@ const AlnorasNavbar = () => {
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center space-x-6">
               {menuItems.map((item) => (
-                <div key={item.name} className="relative group">
-                  <a
-                    href={item.href}
-                    className={`flex items-center space-x-1 px-3 py-2 font-medium transition-colors duration-200 ${
-                      isScrolled 
-                        ? 'text-gray-800 hover:text-blue-600' 
-                        : 'text-gray-800 hover:text-blue-600'
-                    }`}
-                  >
-                    <span>{item.name}</span>
-                    {item.hasDropdown && (
-                      <ChevronDown className="w-4 h-4 group-hover:rotate-180 transition-transform duration-300" />
-                    )}
-                  </a>
-                  
-                  {item.hasDropdown && (
-                    <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
-                      <div className="py-2">
-                        <a href="#car-rental" className="block px-4 py-2 text-gray-700 hover:bg-gray-50">Car Rental</a>
-                        <a href="#workshops" className="block px-4 py-2 text-gray-700 hover:bg-gray-50">Mechanical Workshops</a>
-                        <a href="#transport" className="block px-4 py-2 text-gray-700 hover:bg-gray-50">Transport Logistics</a>
-                        <a href="#energy" className="block px-4 py-2 text-gray-700 hover:bg-gray-50">Clean Energy</a>
-                      </div>
-                    </div>
-                  )}
-                </div>
+                <a
+                  key={item.name}
+                  href={item.href}
+                  className={`px-3 py-2 font-medium transition-colors duration-200 ${
+                    isScrolled 
+                      ? 'text-gray-800 hover:text-[#29419a]' 
+                      : 'text-gray-800 hover:text-[#29419a]'
+                  }`}
+                >
+                  {item.name}
+                </a>
               ))}
               
-          
+              {/* Catalog Download Icon */}
+              <button
+                onClick={handleCatalogDownload}
+                className={`p-2 rounded-full transition-colors duration-200 ${
+                  isScrolled 
+                    ? 'text-gray-800 hover:text-blue-600 hover:bg-gray-100' 
+                    : 'text-gray-800 hover:text-blue-600 hover:bg-gray-100'
+                }`}
+                title="Download Catalog"
+              >
+                <Download className="w-5 h-5" />
+              </button>
             </div>
 
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className={`lg:hidden p-2 rounded-md transition-colors ${
-                isScrolled 
-                  ? 'text-gray-800 hover:bg-gray-100' 
-                  : 'text-gray-800 hover:bg-gray-100'
-              }`}
-            >
-              {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
-          </div>
-        </div>
-
-        {/* Mobile Menu */}
-        <div className={`lg:hidden transition-all duration-300 ease-out ${
-          isMobileMenuOpen 
-            ? 'max-h-96 opacity-100' 
-            : 'max-h-0 opacity-0 overflow-hidden'
-        }`}>
-          <div className="bg-white/95 backdrop-blur-md">
-            <div className="container mx-auto px-6 py-2">
-              <div className="space-y-1">
-                {menuItems.map((item) => (
-                  <div key={item.name}>
-                    <a
-                      href={item.href}
-                      className="block px-4 py-3 text-gray-800 hover:bg-gray-50 rounded-md"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      {item.name}
-                    </a>
-                    {item.hasDropdown && (
-                      <div className="ml-4 space-y-1">
-                        <a href="#car-rental" className="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-50">Car Rental</a>
-                        <a href="#workshops" className="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-50">Mechanical Workshops</a>
-                        <a href="#transport" className="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-50">Transport Logistics</a>
-                        <a href="#energy" className="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-50">Clean Energy</a>
-                      </div>
-                    )}
-                  </div>
-                ))}
-                <button className="w-full mt-2 mb-4 px-4 py-3 bg-transparent text-white rounded-4xl font-medium">
-                  Get Quote
-                </button>
-              </div>
+            {/* Mobile Menu Button and Download Icon */}
+            <div className="lg:hidden flex items-center space-x-2">
+              {/* Catalog Download Icon for Mobile */}
+              <button
+                onClick={handleCatalogDownload}
+                className={`p-2 rounded-full transition-colors ${
+                  isScrolled 
+                    ? 'text-gray-800 hover:text-[#29419a] hover:bg-gray-100' 
+                    : 'text-gray-800 hover:text-[#29419a] hover:bg-gray-100'
+                }`}
+                title="Download Catalog"
+              >
+                <Download className="w-5 h-5" />
+              </button>
+              
+              {/* Mobile Menu Button */}
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className={`p-2 rounded-md transition-colors ${
+                  isScrolled 
+                    ? 'text-gray-800 hover:bg-gray-100' 
+                    : 'text-gray-800 hover:bg-gray-100'
+                }`}
+              >
+                {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              </button>
             </div>
           </div>
         </div>
+{/* Modern Mobile Menu */}
+<div className={`lg:hidden transition-all duration-500 ease-in-out ${
+  isMobileMenuOpen 
+    ? 'max-h-screen opacity-100' 
+    : 'max-h-0 opacity-0 overflow-hidden'
+}`}>
+  <div className="bg-gradient-to-b from-[#29419a] to-[#1a2c6e] w-full h-full mt-2 shadow-xl rounded-lg">
+    <div className="px-4 py-3">
+      <div className="space-y-2">
+        {menuItems.map((item) => (
+          <a
+            key={item.name}
+            href={item.href}
+            className="block px-6 py-5 text-lg font-medium text-white hover:bg-white/10 hover:shadow-md hover:scale-[1.02] transform transition-all duration-250 ease-out rounded-lg backdrop-blur-sm"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            <div className="flex items-center">
+         
+              <span>{item.name}</span>
+              <span className="ml-auto text-white/50">
+                →
+              </span>
+            </div>
+          </a>
+        ))}
+        
+      
+      </div>
+    </div>
+  </div>
+</div>
       </nav>
-
-      {/* Spacer to prevent content overlap */}
-   
     </>
   );
 };
