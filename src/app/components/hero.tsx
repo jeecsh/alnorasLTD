@@ -435,10 +435,10 @@ window.gsap.to(circleRef.current, {
                 we're here to support your business growth across Sudan and beyond.
               </p>
             </div>
-            <button className="group inline-flex items-center justify-center px-10 py-5 bg-[#29419a] text-white rounded-full font-medium text-lg hover:bg-[#1d2e7a] transition-all duration-200 hover:scale-105 hover:shadow-xl">
-              Request Quote
-              <ArrowRight className="ml-3 w-6 h-6 transition-transform group-hover:translate-x-1" />
-            </button>
+            <a href="#contact" className="group inline-flex items-center justify-center px-8 py-4 bg-[#29419a] text-white rounded-full font-medium hover:bg-[#1d2e7a] transition-all duration-200 hover:scale-105 hover:shadow-lg">
+                  Request Quote
+                  <ArrowRight className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />
+                </a>
           </div>
         </div>
       </div>
