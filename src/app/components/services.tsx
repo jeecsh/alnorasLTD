@@ -164,7 +164,7 @@ const OurServices = () => {
                 ref={(el) => {
                   serviceItemsRef.current[index] = el;
                 }}
-                className="group h-[420px] perspective-1000"
+                className="group h-[400px] perspective-1000"
                 style={{
                   // Better fallback styles with proper visibility
                   opacity: gsapLoaded ? undefined : 1,
@@ -227,13 +227,13 @@ const OurServices = () => {
                     
                     {/* CTA Button */}
                     <div className="mt-auto">
-                      <button className="w-full group/btn relative overflow-hidden bg-white/10 hover:bg-white text-white hover:text-[#29419a] rounded-xl py-3 px-4 font-medium transition-all duration-300 hover:scale-[1.02] hover:shadow-lg border border-white/20 hover:border-white">
+                      {/* <button className="w-full group/btn relative overflow-hidden bg-white/10 hover:bg-white text-white hover:text-[#29419a] rounded-xl py-3 px-4 font-medium transition-all duration-300 hover:scale-[1.02] hover:shadow-lg border border-white/20 hover:border-white">
                         <span className="relative z-10 flex items-center justify-center gap-2">
                           Learn More
                           <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover/btn:translate-x-1" />
                         </span>
-                        <div className="absolute inset-0 bg-white scale-x-0 group-hover/btn:scale-x-100 transition-transform duration-300 origin-left"></div>
-                      </button>
+                        <div className="absolute inset-0 bg-whit  e scale-x-0 group-hover/btn:scale-x-100 transition-transform duration-300 origin-left"></div>
+                      </button> */}
                     </div>
                   </div>
                   

@@ -6,6 +6,7 @@ import { Menu, X, Download } from 'lucide-react';
 const AlnorasNavbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isPdfDropdownOpen, setIsPdfDropdownOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -23,12 +24,18 @@ const AlnorasNavbar = () => {
     { name: 'Contact', href: '#contact' }
   ];
 
-  const handleCatalogDownload = () => {
-    // Create a download link for the catalog from public folder
-    const link = document.createElement('a');
-    link.href = '/catalog.pdf'; // Assuming your catalog is named catalog.pdf
-    link.download = 'Alnoras-Catalog.pdf';
-    link.click();
+  const pdfDocuments = [
+    { name: 'Construction Works CV', href: '/Alnoras Integrated Solutions CO.LTD- Construction works CV.pdf' },
+    { name: 'Natural Bounty Company Profile', href: '/Alnoras - Natural Bounty COMPANY PROFILE .pdf' },
+    { name: 'Alnoras Profile - Conference', href: '/Alnoras Profile- confrence.pdf' },
+    { name: 'Solar Energy Company Profile', href: '/Alnoras - Solar Energy COMPANY PROFILE .pdf' },
+    { name: 'Alnoras Transportation', href: '/alnoras - transportation.pdf' },
+    { name: 'Car Rentals Profile', href: '/Car Rentals profile.pdf' },
+    { name: 'Non-food Profile', href: '/Non-food Profile.pdf' },
+  ];
+
+  const togglePdfDropdown = () => {
+    setIsPdfDropdownOpen(!isPdfDropdownOpen);
   };
 
   return (
@@ -73,35 +80,39 @@ const AlnorasNavbar = () => {
                 </a>
               ))}
               
-              {/* Catalog Download Icon */}
-              <button
-                onClick={handleCatalogDownload}
-                className={`p-2 rounded-full transition-colors duration-200 ${
-                  isScrolled 
-                    ? 'text-gray-800 hover:text-blue-600 hover:bg-gray-100' 
-                    : 'text-gray-800 hover:text-blue-600 hover:bg-gray-100'
-                }`}
-                title="Download Catalog"
-              >
-                <Download className="w-5 h-5" />
-              </button>
+              {/* PDF Dropdown for Desktop */}
+              <div className="relative">
+                <button
+                  onClick={togglePdfDropdown}
+                  className={`flex items-center px-3 py-2 font-medium transition-colors duration-200 ${
+                    isScrolled 
+                      ? 'text-gray-800 hover:text-[#29419a]' 
+                      : 'text-gray-800 hover:text-[#29419a]'
+                  }`}
+                >
+                  Documents <Download className={`ml-1 w-4 h-4 transition-transform duration-200 ${isPdfDropdownOpen ? 'rotate-180' : ''}`} />
+                </button>
+                {isPdfDropdownOpen && (
+                  <div className={`absolute right-0 mt-2 w-60 bg-white rounded-md shadow-lg py-1 z-20 transition-all duration-300 ease-out ${isPdfDropdownOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
+                    {pdfDocuments.map((pdf) => (
+                      <a
+                        key={pdf.name}
+                        href={pdf.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        onClick={() => setIsPdfDropdownOpen(false)}
+                      >
+                        {pdf.name}
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* Mobile Menu Button and Download Icon */}
+            {/* Mobile Menu Button and PDF Dropdown for Mobile */}
             <div className="lg:hidden flex items-center space-x-2">
-              {/* Catalog Download Icon for Mobile */}
-              <button
-                onClick={handleCatalogDownload}
-                className={`p-2 rounded-full transition-colors ${
-                  isScrolled 
-                    ? 'text-gray-800 hover:text-[#29419a] hover:bg-gray-100' 
-                    : 'text-gray-800 hover:text-[#29419a] hover:bg-gray-100'
-                }`}
-                title="Download Catalog"
-              >
-                <Download className="w-5 h-5" />
-              </button>
-              
               {/* Mobile Menu Button */}
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -141,8 +152,34 @@ const AlnorasNavbar = () => {
             </div>
           </a>
         ))}
-        
-      
+        {/* PDF Dropdown for Mobile */}
+        <div className="relative">
+          <button
+            onClick={togglePdfDropdown}
+            className="block px-6 py-5 text-lg font-medium text-white hover:bg-white/10 hover:shadow-md hover:scale-[1.02] transform transition-all duration-250 ease-out rounded-lg backdrop-blur-sm w-full text-left flex items-center"
+          >
+            Documents <Download className={`ml-auto w-4 h-4 transition-transform duration-200 ${isPdfDropdownOpen ? 'rotate-180' : ''}`} />
+          </button>
+          {isPdfDropdownOpen && (
+            <div className="mt-2 space-y-1 pl-8">
+              {pdfDocuments.map((pdf) => (
+                <a
+                  key={pdf.name}
+                  href={pdf.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block px-4 py-3 text-sm text-white/80 hover:bg-white/5 rounded-lg"
+                  onClick={() => {
+                    setIsPdfDropdownOpen(false);
+                    setIsMobileMenuOpen(false);
+                  }}
+                >
+                  {pdf.name}
+                </a>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   </div>
